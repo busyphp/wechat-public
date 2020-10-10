@@ -18,7 +18,7 @@ class InstallController extends Controller
 {
     public function index()
     {
-        $this->app->config->load($this->app->getRootPath() . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'extend' . DIRECTORY_SEPARATOR . 'wechat.php', '{$controlName}');
+        $this->app->config->load($this->app->getRootPath() . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'extend' . DIRECTORY_SEPARATOR . 'wechat.php', 'wechat');
         $groupName   = Str::snake(trim($this->app->config->get('wechat.public.admin_module', 'system')));
         $controlName = Str::snake(trim($this->app->config->get('wechat.public.admin_control', 'wechat')));
         
@@ -85,8 +85,7 @@ SQL;
             
             return $this->success('安装成功', '/');
         } catch (\Exception $e) {
-            dump($e);
-            //return $this->error($e->getMessage(), '/');
+            return $this->error($e->getMessage(), '/');
         }
     }
 }
