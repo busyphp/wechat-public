@@ -19,7 +19,7 @@ use BusyPHP\wechat\publics\events\TextMessageEvent;
 use BusyPHP\wechat\publics\events\VideoMessageEvent;
 use BusyPHP\wechat\publics\events\ViewEvent;
 use BusyPHP\wechat\publics\events\VoiceMessageEvent;
-use core\api\wechat\WeChatLogs;
+use BusyPHP\wechat\WeChatLogs;
 use think\Response;
 use Throwable;
 

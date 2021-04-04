@@ -15,7 +15,9 @@
 		"busyphp/oauth"        : "^1.0",
 		"busyphp/wechat-base"  : "^1.0",
 		"busyphp/wechat-oauth" : "^1.0",
-		"ext-json"             : "*"
+		"ext-json"             : "*",
+		"ext-libxml"           : "*",
+		"ext-simplexml"        : "*"
 	},
 	"require-dev" : {
 		"symfony/var-dumper" : "^4.2"
