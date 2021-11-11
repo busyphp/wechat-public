@@ -2,17 +2,19 @@
 
 namespace BusyPHP\wechat\publics;
 
-
-use BusyPHP\wechat\WeChat;
+use BusyPHP\wechat\WeChatConfig;
+use think\App;
 
 /**
  * 微信公众号基本类
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午3:10 下午 WeChatPublic.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:46 WeChatPublic.php $
  */
-abstract class WeChatPublic extends WeChat
+abstract class WeChatPublic
 {
+    use WeChatConfig;
+    
     /**
      * 公众号appId
      * @var string
@@ -37,14 +39,18 @@ abstract class WeChatPublic extends WeChat
      */
     private $encodingAESKey;
     
+    /**
+     * @var App
+     */
+    protected $app;
+    
     
     /**
      * WeChatPublic constructor.
      */
     public function __construct()
     {
-        parent::__construct();
-        
+        $this->app            = App::getInstance();
         $this->appId          = $this->getConfig('public.app_id');
         $this->appSecret      = $this->getConfig('public.app_secret');
         $this->token          = $this->getConfig('public.token');
