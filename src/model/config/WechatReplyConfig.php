@@ -4,7 +4,8 @@ namespace BusyPHP\wechat\publics\model\config;
 
 use BusyPHP\helper\FilterHelper;
 use BusyPHP\wechat\publics\model\WechatConfig;
-use Exception;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\DbException;
 
 /**
  * 关注时回复配置
@@ -17,70 +18,33 @@ class WechatReplyConfig extends WechatConfig
     protected $key = 'reply';
     
     
-    /**
-     * 获取数据
-     * @param string $key 获取键
-     * @return array|mixed
-     * @throws Exception
-     */
-    public function getConfigure($key = '')
+    public function setContent($content)
     {
-        $value = parent::getConfigure();
-        if ($key) {
-            return $value[$key];
-        }
-        
-        return $value;
-    }
-    
-    
-    /**
-     * 设置数据
-     * @param array $value
-     * @throws Exception
-     */
-    public function setConfigure($value)
-    {
-        $value = FilterHelper::trim($value);
-        
-        parent::setConfigure($value);
+        $content = FilterHelper::trim($content);
+        parent::setContent($content);
     }
     
     
     /**
      * 获取关注回复内容
-     * @return string|false
+     * @return string
+     * @throws DataNotFoundException
+     * @throws DbException
      */
-    public function getFollow()
+    public function getFollow() : string
     {
-        try {
-            $message = $this->getConfigure('follow');
-            if (empty($message)) {
-                throw new Exception();
-            }
-            
-            return $message;
-        } catch (Exception $e) {
-            return false;
-        }
+        return $this->getContent()['follow'] ?? '';
     }
     
     
     /**
      * 获取非关键词回复内容
-     * @return string|false
+     * @return string
+     * @throws DataNotFoundException
+     * @throws DbException
      */
-    public function getOther()
+    public function getOther() : string
     {
-        try {
-            $message = $this->getConfigure('other');
-            if (empty($message)) {
-                throw new Exception();
-            }
-            
-            return $message;
-        } catch (Exception $e) {
-            return false;
-        }
+        return $this->getContent()['other'] ?? '';
     }
 }

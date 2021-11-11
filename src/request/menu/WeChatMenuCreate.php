@@ -19,7 +19,6 @@ class WeChatMenuCreate extends WeChatMenu
     /**
      * 设置菜单集合
      * @param WeChatMenuItem[] $menuList
-     * @throws WeChatPublicException
      */
     public function setMenuList(array $menuList)
     {

@@ -2,8 +2,6 @@
 
 namespace BusyPHP\wechat\publics\request\menu;
 
-use BusyPHP\wechat\publics\WeChatPublicException;
-
 /**
  * 自定义菜单删除接口
  * @author busy^life <busy.life@qq.com>
@@ -19,7 +17,6 @@ class WeChatMenuDelete extends WeChatMenu
     /**
      * 执行删除
      * @return array
-     * @throws WeChatPublicException
      */
     public function delete() : array
     {

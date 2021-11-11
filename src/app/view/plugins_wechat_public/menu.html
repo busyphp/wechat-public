@@ -1,0 +1,399 @@
+<extend name="@admin:layout"/>
+<block name="head">
+    <style>
+        .list-group li { cursor: pointer; padding: 0; border: 0; margin: 0 }
+        .list-group .item { padding: 10px; border-bottom: 1px #eee solid}
+        .list-group ul { padding: 0 }
+        .list-group ul li .item { padding-left: 50px; position: relative; }
+        .list-group ul li .item:before,
+        .list-group ul li .item:after { content: ""; position: absolute; }
+        .list-group ul li .item:before { height: 100%; width: 10px; border-right: 1px #BBB dotted; left: 20px; top: 0; }
+        .list-group ul li .item:after { width: 15px; height: 10px; border-top: 1px #BBB dotted; left: 30px; top: 20px; }
+        .list-group ul li:last-child .item:before { height: 50%; }
+        .list-group .pull-right { display: none; }
+        .list-group .pull-right a { cursor: move; }
+
+        .list-group .item.active,
+        .list-group .item.active:hover { background-color: #FFF; background-image: none; color: #3eb94e; text-shadow: none; border: 1px #3eb94e solid !important; margin-left: -1px; margin-right: -1px; border-radius: 0 !important; }
+        .list-group li:first-child .item.active,
+        .list-group li:first-child .item.active:hover { margin-top: -1px; }
+        .list-group .item.active .pull-right { display: block; }
+
+
+        .panel-heading .btn { margin: -6px -12px -7px 0; }
+        .list-group-add-parent { text-align: center; }
+        .list-group-add-parent:before { content: ""; border: 2px #eee dashed; position: absolute; left: 3px; right: 3px; top: 3px; bottom: 3px; }
+        .list-group-add-parent:hover { color: #3eb94e; }
+        .list-group-add-parent:hover:before { border-color: #3eb94e !important; }
+        .list-group-add-child { background-color: #F9F9F9; }
+        .list-group-add-child:hover { color: #3eb94e; background-color: #F6F6F6; }
+    </style>
+</block>
+<block name="content">
+    <template id="pluginsWeChatMenuApp">
+        <form data-toggle="busy-verify" ref="form">
+            <div class="row row-gutters-15">
+                <div class="col-sm-6 col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">菜单列表</h3>
+                        </div>
+                        <ul class="list-group" ref="menu">
+                            <li class="list-group-item list-group-items list-group-parent" v-for="(item, index) in list">
+                                <div class="item" :class="item.active ? 'active': ''" @click="onItemClick(index)">
+                                    <div class="pull-right">
+                                    <a class="btn btn-xs btn-success list-group-prev">
+                                        <i class="fa fa-arrows"></i>
+                                    </a>
+                                    </div>
+                                    <span>{{item.name}}</span>
+                                    <input type="hidden" :name="'button['+ index +'][name]'" v-model="item.name"/>
+                                    <input type="hidden" :name="'button['+ index +'][value]'" v-model="item.value"/>
+                                    <input type="hidden" :name="'button['+ index +'][type]'" v-model="item.type"/>
+                                    <input type="hidden" :name="'button['+ index +'][app_id]'" v-model="item.app_id"/>
+                                    <input type="hidden" :name="'button['+ index +'][app_path]'" v-model="item.app_path"/>
+                                </div>
+
+                                <ul ref="sub">
+                                    <template v-if="item.sub_button && item.sub_button.length > 0">
+                                        <li class="list-group-item list-group-items list-group-child" v-for="(vo, i) in item.sub_button">
+                                            <div class="item" :class="vo.active ? 'active': ''" @click="onVoClick(index, i)">
+                                                <div class="pull-right">
+                                                <a class="btn btn-xs btn-success list-group-prev ">
+                                                    <i class="fa fa-arrows"></i>
+                                                </a>
+                                                </div>
+                                                <span>{{vo.name}}</span>
+                                                <input type="hidden" :name="'button['+ index +'][sub_button][list]['+ i +'][name]'" v-model="vo.name"/>
+                                                <input type="hidden" :name="'button['+ index +'][sub_button][list]['+ i +'][value]'" v-model="vo.value"/>
+                                                <input type="hidden" :name="'button['+ index +'][sub_button][list]['+ i +'][type]'" v-model="vo.type"/>
+                                                <input type="hidden" :name="'button['+ index +'][sub_button][list]['+ i +'][app_id]'" v-model="vo.app_id"/>
+                                                <input type="hidden" :name="'button['+ index +'][sub_button][list]['+ i +'][app_path]'" v-model="vo.app_path"/>
+                                            </div>
+                                        </li>
+                                    </template>
+
+                                    <li v-if="(item.sub_button || []).length < 5" class="list-group-item list-group-add-child" @click="onAddSub(index)">
+                                        <div class="item">
+                                            <i class="fa fa-plus"></i> 添加子菜单
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li class="list-group-item list-group-add-parent" v-if="list.length < 3" @click="onAddMenu">
+                                <div class="item">
+                                    <i class="fa fa-plus"></i> 添加主菜单
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-8">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <button type="button" class="btn btn-danger btn-sm pull-right" :disabled="!showForm" @click="onDelete">
+                                <i class="fa fa-trash"></i>
+                                删除该菜单
+                            </button>
+                            <h3 class="panel-title">菜单属性</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-horizontal" v-if="showForm">
+                                <div class="form-group">
+                                    <div class="col-sm-3 col-md-2 control-label required">菜单名称</div>
+                                    <div class="col-sm-9 col-md-10">
+                                        <input type="text" class="form-control" placeholder="请输入菜单名称" required v-model="info.name" @input="onUpdate"/>
+                                        <p class="help-block">字数不超过8个汉字或16个字母</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-3 col-md-2 control-label">菜单类型</div>
+                                    <div class="col-sm-9 col-md-10">
+                                        <select class="form-control" v-model="info.type" ref="type" @input="onUpdate">
+                                            {$type_options}
+                                        </select>
+                                        <p class="help-block" v-if="hide">{{helper}}</p>
+                                    </div>
+                                </div>
+                                <div class="form-group" :class="hide ? 'hide' : ''">
+                                    <div class="col-sm-3 col-md-2 control-label">{{label}}</div>
+                                    <div class="col-sm-9 col-md-10">
+                                        <input class="form-control" :placeholder="placeholder" v-model="info.value" @input="onUpdate" required/>
+                                        <p class="help-block">{{helper}}</p>
+                                    </div>
+                                </div>
+                                <template v-if="info.type == '<?=\BusyPHP\wechat\publics\request\menu\WeChatMenu::TYPE_MINI_PROGRAM?>'">
+                                    <div class="form-group">
+                                        <div class="col-sm-3 col-md-2 control-label">小程序appId</div>
+                                        <div class="col-sm-9 col-md-10">
+                                            <input class="form-control" placeholder="请输入小程序的APPID" @input="onUpdate" v-model="info.app_id" required/>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-3 col-md-2 control-label">小程序页面路径</div>
+                                        <div class="col-sm-9 col-md-10">
+                                            <input class="form-control" placeholder="请输入小程序页面路径" @input="onUpdate" v-model="info.app_path" required/>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="empty-info" v-else>
+                                请选择左侧菜单
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="pull-right">
+                                <button type="button" class="btn btn-default" @click="onSave">
+                                    <i class="fa fa-check"></i>
+                                    本地保存
+                                </button>
+                                <button type="button" class="btn btn-success" @click="onUpload">
+                                    <i class="fa fa-wechat"></i>
+                                    发布到微信
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-secondary" @click="onDownload">
+                                    <i class="fa fa-refresh"></i>
+                                    同步菜单
+                                </button>
+                                <button type="button" class="btn btn-danger" v-if="!disabled" @click="onStop">
+                                    <i class="fa fa-close"></i>
+                                    停用菜单
+                                </button>
+                                <button type="button" class="btn btn-success" v-else @click="onStart">
+                                    启用菜单
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </template>
+</block>
+<block name="foot">
+    <script>
+        busyAdmin.ready(function () {
+            busyAdmin.require([busyAdmin.lib.vue, busyAdmin.lib.sortable], function (Vue, Sortable) {
+                new Vue({
+                    el      : '#pluginsWeChatMenuApp',
+                    data    : {
+                        disabled         : <?=$disabled ? 'true' : 'false'?>,
+                        list             : <?=json_encode($list, JSON_UNESCAPED_UNICODE);?>,
+                        info             : {},
+                        showForm         : false,
+                        currentMenuIndex : -1,
+                        currentSubIndex  : -1,
+                        label            : '',
+                        helper           : '',
+                        placeholder      : '',
+                        hide             : false,
+                    },
+                    watch   : {
+                        'info.name'     : function () {
+                            this.onUpdate();
+                        },
+                        'info.value'    : function () {
+                            console.log(1);
+                            this.onUpdate();
+                        },
+                        'info.type'     : function () {
+                            this.onUpdate();
+                            var me = this;
+                            me.$nextTick(function () {
+                                var config     = $(me.$refs.type).find(':selected').data('config');
+                                me.label       = config.label;
+                                me.placeholder = config.placeholder;
+                                me.hide        = config.hide;
+                                me.helper      = config.desc;
+                            });
+                        },
+                        'info.appid'    : function () {
+                            this.onUpdate();
+                        },
+                        'info.pagepath' : function () {
+                            this.onUpdate();
+                        },
+                        'list'          : function () {
+                            this.initSort();
+                        }
+                    },
+                    mounted : function () {
+                        this.list.map(function (item) {
+                            item.sub_button = item.sub_button || [];
+                        });
+
+                        var me = this;
+                        new Sortable(this.$refs.menu, {
+                            handle    : '.btn',
+                            filter    : '.list-group-add-parents',
+                            draggable : '.list-group-items',
+                            onEnd     : function (e) {
+                                me.list.splice(e.newIndex, 0, me.list.splice(e.oldIndex, 1)[0]);
+                                var list = me.list.slice(0);
+                                me.list  = [];
+                                me.$nextTick(function () {
+                                    me.list = list;
+                                });
+                            }
+                        })
+                        me.initSort();
+                    },
+                    methods : {
+                        initSort    : function () {
+                            var me = this;
+                            me.$nextTick(function () {
+                                me.$refs.sub.map(function (el) {
+                                    new Sortable(el, {
+                                        handle    : '.btn',
+                                        filter    : '.list-group-add-child',
+                                        draggable : '.list-group-child',
+                                        onEnd     : function (e) {
+                                            me.list[me.currentMenuIndex].sub_button.splice(e.newIndex, 0, me.list[me.currentMenuIndex].sub_button.splice(e.oldIndex, 1)[0]);
+                                            var list                                = me.list[me.currentMenuIndex].sub_button.slice(0);
+                                            me.list[me.currentMenuIndex].sub_button = [];
+                                            me.$nextTick(function () {
+                                                me.list[me.currentMenuIndex].sub_button = list;
+                                            });
+                                        }
+                                    });
+                                });
+                            });
+                        },
+                        onItemClick : function (index) {
+                            this.currentMenuIndex = index;
+                            this.currentSubIndex  = -1;
+                            this.showForm         = true;
+                            this.info             = this.list[index];
+                            this.list.map(function (item, number) {
+                                item.active = number == index;
+                                item.sub_button.map(function (sub) {
+                                    sub.active = false;
+                                });
+                            });
+                        },
+                        onVoClick   : function (index, subIndex) {
+                            this.currentMenuIndex = index;
+                            this.currentSubIndex  = subIndex;
+                            this.showForm         = true;
+                            this.info             = this.list[index].sub_button[subIndex];
+                            this.list.map(function (item, number) {
+                                item.active = false;
+                                if (number == index) {
+                                    item.sub_button.map(function (sub, i) {
+                                        sub.active = subIndex == i;
+                                    });
+                                } else {
+                                    item.sub_button.map(function (sub, i) {
+                                        sub.active = false;
+                                    });
+                                }
+                            });
+                        },
+                        onAddMenu   : function () {
+                            this.list.push({
+                                name       : '新建菜单' + (this.list.length + 1),
+                                type       : 'view',
+                                value      : '',
+                                appid      : '',
+                                pagepath   : '',
+                                sub_button : [],
+                            });
+                            this.onItemClick(this.list.length - 1);
+                        },
+                        onAddSub    : function (index) {
+                            this.list[index].sub_button = this.list[index].sub_button || [];
+                            this.list[index].sub_button.push({
+                                name     : '新建子菜单' + (this.list[index].sub_button.length + 1),
+                                value    : '',
+                                appid    : '',
+                                pagepath : '',
+                                type     : 'view',
+                            });
+                            this.onVoClick(index, this.list[index].sub_button.length - 1);
+                        },
+                        onDelete    : function () {
+                            if (this.currentMenuIndex !== -1 && this.currentSubIndex !== -1) {
+                                this.list[this.currentMenuIndex].sub_button = this.list[this.currentMenuIndex].sub_button.del(this.currentSubIndex);
+                                this.showForm                               = false;
+                            } else if (this.currentMenuIndex !== -1) {
+                                this.list     = this.list.del(this.currentMenuIndex);
+                                this.showForm = false;
+                            }
+                        },
+                        onUpdate    : function () {
+                            if (this.currentMenuIndex !== -1 && this.currentSubIndex !== -1) {
+                                this.list[this.currentMenuIndex].sub_button[this.currentSubIndex].name     = this.info.name;
+                                this.list[this.currentMenuIndex].sub_button[this.currentSubIndex].value    = this.info.value;
+                                this.list[this.currentMenuIndex].sub_button[this.currentSubIndex].type     = this.info.type;
+                                this.list[this.currentMenuIndex].sub_button[this.currentSubIndex].appid    = this.info.appid;
+                                this.list[this.currentMenuIndex].sub_button[this.currentSubIndex].pagepath = this.info.pagepath;
+                            } else if (this.currentMenuIndex !== -1) {
+                                this.list[this.currentMenuIndex].name     = this.info.name;
+                                this.list[this.currentMenuIndex].value    = this.info.value;
+                                this.list[this.currentMenuIndex].type     = this.info.type;
+                                this.list[this.currentMenuIndex].appid    = this.info.appid;
+                                this.list[this.currentMenuIndex].pagepath = this.info.pagepath;
+                            }
+                        },
+                        onSave      : function () {
+                            busyAdmin
+                                .request('{:url("menu_update")}')
+                                .method("post")
+                                .params($(this.$refs.form))
+                                .exec();
+                        },
+                        onUpload    : function () {
+                            var me = this;
+                            busyAdmin.dialog.confirm('确认要发布到微信菜单吗？<div class=text-success>发布后最迟48小时内全量生效</div>', function () {
+                                busyAdmin
+                                    .request('{:url("menu_upload")}')
+                                    .method("post")
+                                    .params($(me.$refs.form))
+                                    .success(function (response, type, xhr) {
+                                        busyAdmin.route.reload();
+                                    })
+                                    .exec();
+                            });
+                        },
+                        onStop      : function () {
+                            busyAdmin.dialog.confirm('确认要停用微信菜单吗？<div class=text-red>停用后微信公众号将不显示菜单</div>', function () {
+                                busyAdmin
+                                    .request('{:url("menu_stop")}')
+                                    .success(function (response, type, xhr) {
+                                        busyAdmin.route.reload();
+                                    })
+                                    .exec();
+                            });
+                        },
+                        onStart     : function () {
+                            var me = this;
+                            busyAdmin.dialog.confirm('确认要启用微信菜单吗？<div class=text-success>启用后微信公众号将显示菜单</div>', function () {
+                                busyAdmin
+                                    .request('{:url("menu_upload?type=start")}')
+                                    .method("post")
+                                    .params($(me.$refs.form))
+                                    .success(function (response, type, xhr) {
+                                        busyAdmin.route.reload();
+                                    })
+                                    .exec();s
+                            });
+                        },
+                        onDownload  : function () {
+                            busyAdmin.dialog.confirm('确认要同步微信菜单至本地吗？', function () {
+                                busyAdmin
+                                    .request('{:url("menu_download")}')
+                                    .success(function (response, type, xhr) {
+                                        busyAdmin.route.reload();
+                                    })
+                                    .exec();
+                            });
+                        }
+                    }
+                })
+            });
+        });
+    </script>
+</block>

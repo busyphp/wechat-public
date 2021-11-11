@@ -4,12 +4,14 @@ namespace BusyPHP\wechat\publics\request\menu;
 
 use BusyPHP\exception\VerifyException;
 use BusyPHP\model\ObjectOption;
+use ErrorException;
 
 /**
  * 微信菜单Item
  * @author busy^life <busy.life@qq.com>
  * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
  * @version $Id: 2021/11/11 上午10:28 WeChatMenuItem.php $
+ * @property string $value
  */
 class WeChatMenuItem extends ObjectOption
 {
@@ -110,7 +112,7 @@ class WeChatMenuItem extends ObjectOption
      * @return $this
      * @throws VerifyException
      */
-    public function create($isSub, $type, $name, $value, $appId = '', $appPath = '')
+    public function create(bool $isSub, string $type, string $name, string $value, string $appId = '', string $appPath = '')
     {
         $name    = trim($name);
         $type    = trim($type);
@@ -172,5 +174,37 @@ class WeChatMenuItem extends ObjectOption
         }
         
         return $this;
+    }
+    
+    
+    /**
+     * @param $name
+     * @return string
+     * @throws ErrorException
+     */
+    public function __get($name)
+    {
+        if ($name === 'value') {
+            switch ($this->type) {
+                case WeChatMenu::TYPE_VIEW:
+                    return $this->url;
+                case WeChatMenu::TYPE_MEDIA_ID:
+                case WeChatMenu::TYPE_VIEW_LIMITED:
+                    return $this->media_id;
+                default:
+                    return $this->key;
+            }
+        }
+        
+        throw new ErrorException('Undefined property: ' . self::class . '::$' . $name);
+    }
+    
+    
+    public function toArray() : array
+    {
+        $info          = parent::toArray();
+        $info['value'] = $this->value;
+        
+        return $info;
     }
 }

@@ -20,13 +20,12 @@ class WeChatMenuGet extends WeChatMenu
      * 执行查询
      * @return WeChatMenuGetResult
      */
-    public function get()
+    public function get() : WeChatMenuGetResult
     {
-        $result = parent::request();
-        
-        $res             = new WeChatMenuGetResult();
-        $res->isDisabled = TransHelper::toBool($result['is_menu_open']) === false;
-        $menu            = [];
+        $result        = $this->request();
+        $res           = new WeChatMenuGetResult();
+        $res->disabled = TransHelper::toBool($result['is_menu_open']) === false;
+        $menu          = [];
         foreach ($result['selfmenu_info']['button'] as $item) {
             $menu[] = new WeChatMenuItem($item);
         }

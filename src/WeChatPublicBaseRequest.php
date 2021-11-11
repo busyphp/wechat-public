@@ -94,16 +94,7 @@ class WeChatPublicBaseRequest extends WeChatPublic
             throw new WeChatPublicException("HTTP请求失败: {$e->getMessage()} [{$e->getCode()}]");
         }
         
-        $result = json_decode((string) $result, true) ?: [];
-        if (!$result) {
-            throw new WeChatPublicException("请求数据异常");
-        }
-        
-        if (($result['errcode'] ?? -1) != 0) {
-            throw new WeChatPublicException($result['errmsg'] ?? '', intval($result['errcode'] ?? 0));
-        }
-        
-        return $result;
+        return self::parseResult($result);
     }
     
     
@@ -130,15 +121,7 @@ class WeChatPublicBaseRequest extends WeChatPublic
                 throw new WeChatPublicException("HTTP请求失败: {$e->getMessage()} [{$e->getCode()}]");
             }
             
-            $result = json_decode((string) $result, true) ?: [];
-            if (!$result) {
-                throw new WeChatPublicException("请求数据异常");
-            }
-            
-            if (($result['errcode'] ?? -1) != '0') {
-                throw new WeChatPublicException($result['errmsg'] ?? '', intval($result['errcode'] ?? 0));
-            }
-            
+            $result = self::parseResult($result);
             if (empty($result['access_token'])) {
                 throw new WeChatPublicException('获取accessToken失败');
             }
@@ -148,5 +131,25 @@ class WeChatPublicBaseRequest extends WeChatPublic
         }
         
         return $accessToken;
+    }
+    
+    
+    /**
+     * 解析数据
+     * @param $result
+     * @return array
+     */
+    public static function parseResult($result) : array
+    {
+        $result = json_decode((string) $result, true) ?: [];
+        if (!$result) {
+            throw new WeChatPublicException("请求数据异常");
+        }
+        
+        if (isset($result['errcode']) && $result['errcode'] != 0) {
+            throw new WeChatPublicException($result['errmsg'] ?? '', intval($result['errcode'] ?? 0));
+        }
+        
+        return $result;
     }
 }

@@ -2,20 +2,20 @@
 
 namespace BusyPHP\wechat\publics\model\config;
 
-use BusyPHP\wechat\publics\request\menu\WeChatMenu;
+use BusyPHP\wechat\publics\model\WechatConfig;
 use BusyPHP\wechat\publics\request\menu\WeChatMenuCreate;
 use BusyPHP\wechat\publics\request\menu\WeChatMenuDelete;
 use BusyPHP\wechat\publics\request\menu\WeChatMenuGet;
-use BusyPHP\wechat\publics\model\WechatConfig;
 use BusyPHP\wechat\publics\request\menu\WeChatMenuGetResult;
 use BusyPHP\wechat\publics\request\menu\WeChatMenuItem;
-use Exception;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\DbException;
 
 /**
  * 微信菜单配置
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午10:49 上午 WeMenuConfig.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 下午6:32 WechatMenuConfig.php $
  */
 class WechatMenuConfig extends WechatConfig
 {
@@ -23,33 +23,16 @@ class WechatMenuConfig extends WechatConfig
     
     
     /**
-     * 初始化菜单数据
-     * @param bool $must 是否强制初始化
-     * @throws Exception
-     */
-    public function initConfigure($must = false)
-    {
-        if (count($this->getConfigure()->menu) < 1 || $must) {
-            $get = new WeChatMenuGet();
-            $this->setConfigure($get->get());
-        }
-    }
-    
-    
-    /**
      * 获取菜单数据
      * @return mixed
-     * @throws Exception
+     * @throws DataNotFoundException
+     * @throws DbException
      */
-    public function getConfigure() : WeChatMenuGetResult
+    public function getMenu() : WeChatMenuGetResult
     {
-        $result = parent::getConfigure();
+        $result = $this->getContent();
         if (!$result instanceof WeChatMenuGetResult) {
-            $obj             = new WeChatMenuGetResult();
-            $obj->isDisabled = false;
-            $obj->menu       = [];
-            
-            return $obj;
+            return new WeChatMenuGetResult();
         }
         
         return $result;
@@ -57,87 +40,51 @@ class WechatMenuConfig extends WechatConfig
     
     
     /**
-     * 设置菜单数据
-     * @param null|WeChatMenuGetResult|WeChatMenuItem[] $value
-     * @throws Exception
+     * 编辑菜单
+     * @param WeChatMenuItem[] $value
+     * @throws DbException
      */
-    public function setConfigure($value)
+    public function editMenu(array $value)
     {
-        if (is_null($value)) {
-            $value             = new WeChatMenuGetResult();
-            $value->isDisabled = false;
-            $value->menu       = [];
-        } elseif (is_array($value)) {
-            $saveValue         = $value;
-            $value             = new WeChatMenuGetResult();
-            $value->isDisabled = false;
-            $value->menu       = $saveValue;
-        }
-        
-        if (count($value->menu) > 0) {
-            $obj = new WeChatMenuCreate();
-            $obj->setMenuList($value->menu);
-        }
-        
-        parent::setConfigure($value);
+        $res       = $this->getMenu();
+        $res->menu = $value;
+        $this->setContent($res);
     }
     
     
     /**
-     * 删除微信自定义菜单
-     * @throws Exception
+     * 停用菜单
+     * @throws DbException
      */
     public function clear()
     {
-        $del = new WeChatMenuDelete();
-        $del->delete();
-        $this->initConfigure(true);
+        (new WeChatMenuDelete)->delete();
+        
+        $res           = $this->getMenu();
+        $res->disabled = (new WeChatMenuGet())->get()->disabled;
+        $this->setContent($res);
     }
     
     
     /**
      * 发布菜单
-     * @throws Exception
+     * @throws DataNotFoundException
+     * @throws DbException
      */
     public function publish()
     {
         $obj = new WeChatMenuCreate();
-        $obj->setMenuList($this->getConfigure()->menu);
+        $obj->setMenuList($this->getMenu()->menu);
         $obj->create();
     }
     
     
     /**
-     * 获取菜单值
-     * @param WeChatMenuItem $data 单个菜单数据
-     * @return string
+     * 同步菜单
+     * @throws DbException
      */
-    public static function parseValue($data)
+    public function sync()
     {
-        switch ($data['type']) {
-            case WeChatMenu::TYPE_VIEW:
-                return $data['url'];
-            case WeChatMenu::TYPE_MEDIA_ID:
-            case WeChatMenu::TYPE_VIEW_LIMITED:
-                return $data['media_id'];
-            default:
-                return $data['key'];
-        }
-    }
-    
-    
-    protected function onParseBindList(array &$list)
-    {
-        foreach ($list as $i => $r) {
-            $r['value'] = self::parseValue($r);
-            if ($r->sub_button) {
-                foreach ($r->sub_button as $j => $item) {
-                    $item['value']     = self::parseValue($item);
-                    $r->sub_button[$j] = $item;
-                }
-            }
-            
-            $list[$i] = $r;
-        }
+        $this->setContent((new WeChatMenuGet())->get());
     }
 }

@@ -2,9 +2,7 @@
 
 namespace BusyPHP\wechat\publics\model;
 
-use BusyPHP\exception\ParamInvalidException;
 use BusyPHP\Model;
-use Exception;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
 
@@ -27,56 +25,45 @@ class WechatConfig extends Model
     
     /**
      * 获取配置
+     * @param bool $cache
      * @return mixed
-     * @throws Exception
+     * @throws DataNotFoundException
+     * @throws DbException
      */
-    public function getConfigure()
+    public function getContent($cache = true)
     {
-        $info = $this->initConfigure();
+        $content = $this->getCache($this->key);
+        if (!$content || $cache) {
+            $info = $this->findInfo($this->key);
+            if (!$info) {
+                $this->setContent('');
+                $info = $this->getInfo($this->key);
+            }
+            
+            $content = unserialize($info['content']);
+            $this->setCache($this->key, $content);
+        }
         
-        return $info['content'];
+        return $content;
     }
     
     
     /**
      * 设置配置
-     * @param mixed $value
+     * @param mixed $content
      * @throws DbException
      */
-    public function setConfigure($value)
+    public function setContent($content)
     {
-        $this->initConfigure();
-        $this->where('id', '=', $this->key)->saveData(['content' => serialize($value)]);
-        
-        $this->initConfigure(true);
+        $this->addData([
+            'id'      => $this->key,
+            'content' => serialize($content)
+        ], true);
     }
     
     
-    /**
-     * 初始化配置
-     * @param bool $must
-     * @return mixed
-     * @throws DbException
-     * @throws DataNotFoundException
-     */
-    private function initConfigure($must = false)
+    public function onChanged(string $method, $id, array $options)
     {
-        if (!$this->key) {
-            throw new ParamInvalidException('key');
-        }
-        
-        $info = $this->getCache($this->key);
-        if (!$info || $must) {
-            $info = $this->where('id', '=', $this->key)->findInfo();
-            if (!$info) {
-                $this->addData(['id' => $this->key]);
-                $info = $this->getInfo($this->key);
-            }
-            
-            $info['content'] = unserialize($info['content']);
-            $this->setCache($this->key, $info);
-        }
-        
-        return $info;
+        $this->deleteCache($id);
     }
 }
