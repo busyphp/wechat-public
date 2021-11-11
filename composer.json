@@ -1,20 +1,24 @@
 {
 	"name"        : "busyphp/wechat-public",
 	"type"        : "library",
-	"description" : "",
+	"description" : "用于BusyPHP微信公众号管理，支持菜单、自动回复简单管理以及各种公众号事件预设",
+	"homepage"    : "http://www.harter.cn/?form=BusyPHP&plugin=busyphp/wechat-public",
+	"keywords"    : [
+		"公众号",
+		"微信公众号"
+	],
 	"authors"     : [
 		{
 			"name"  : "busy^life",
 			"email" : "busy.life@qq.com"
 		}
 	],
-	"license"     : "Apache-2.0",
+	"license"     : "CC-BY-NC-4.0",
 	"require"     : {
 		"php"                  : ">=7.1.0",
-		"busyphp/busyphp"      : "^3.0",
-		"busyphp/oauth"        : "^1.0",
-		"busyphp/wechat-base"  : "^1.0",
-		"busyphp/wechat-oauth" : "^1.0",
+		"busyphp/oauth"        : "^2.0",
+		"busyphp/wechat-base"  : "^2.0",
+		"busyphp/wechat-oauth" : "^2.0",
 		"ext-json"             : "*",
 		"ext-libxml"           : "*",
 		"ext-simplexml"        : "*"
@@ -29,6 +33,21 @@
 	},
 	"extra"       : {
 		"busyphp" : {
+			"manager"  : {
+				"name"    : "微信公众号模块",
+				"class"   : "BusyPHP\\wechat\\publics\\app\\controller\\ManagerController",
+				"install" : {
+					"install_operate"   : {
+						"type"      : "modal",
+						"success"   : "@table.reload|@app.loadInfo",
+						"modalSize" : "lg"
+					},
+					"uninstall_operate" : {
+						"type"    : "modal",
+						"success" : "@table.reload|@app.loadInfo"
+					}
+				}
+			},
 			"services" : [
 				"BusyPHP\\wechat\\publics\\Service"
 			]
