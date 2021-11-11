@@ -2,17 +2,14 @@
 
 namespace BusyPHP\wechat\publics\request\message\customer;
 
-
 use BusyPHP\wechat\publics\WeChatPublicBaseEvent;
 use BusyPHP\wechat\publics\WeChatPublicBaseRequest;
-use BusyPHP\wechat\publics\WeChatPublicException;
 
 /**
  * 客服接口-发消息
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午12:00 下午 WeChatCustomerSend.php $
- * @see https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421140547
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:21 WeChatCustomerSend.php $
  */
 class WeChatCustomerSend extends WeChatPublicBaseRequest
 {
@@ -173,9 +170,8 @@ class WeChatCustomerSend extends WeChatPublicBaseRequest
     /**
      * 执行发送
      * @return array
-     * @throws WeChatPublicException
      */
-    public function request()
+    public function send() : array
     {
         if ($this->params['msgtype'] == WeChatPublicBaseEvent::MSG_TYPE_NEWS) {
             $articles                         = $this->params['news']['articles'];

@@ -3,13 +3,12 @@
 namespace BusyPHP\wechat\publics\request\message\template;
 
 use BusyPHP\wechat\publics\WeChatPublicBaseRequest;
-use BusyPHP\wechat\publics\WeChatPublicException;
 
 /**
  * 发送模板消息
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午12:03 下午 WeChatTemplateSend.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:19 WeChatTemplateSend.php $
  * @see https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1433751277
  */
 class WeChatTemplateSend extends WeChatPublicBaseRequest
@@ -105,9 +104,8 @@ class WeChatTemplateSend extends WeChatPublicBaseRequest
     /**
      * 执行发送
      * @return string 发送成功模板消息ID
-     * @throws WeChatPublicException
      */
-    public function request()
+    public function send() : string
     {
         $result = parent::request();
         

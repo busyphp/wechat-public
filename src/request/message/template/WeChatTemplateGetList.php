@@ -3,13 +3,12 @@
 namespace BusyPHP\wechat\publics\request\message\template;
 
 use BusyPHP\wechat\publics\WeChatPublicBaseRequest;
-use BusyPHP\wechat\publics\WeChatPublicException;
 
 /**
  * 获取模板列表
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午12:02 下午 WeChatTemplateGetList.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:20 WeChatTemplateGetList.php $
  * @see https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1433751277
  */
 class WeChatTemplateGetList extends WeChatPublicBaseRequest
@@ -19,15 +18,13 @@ class WeChatTemplateGetList extends WeChatPublicBaseRequest
     
     /**
      * 执行发送
-     * @return WeChatTemplateGetListList
-     * @throws WeChatPublicException
+     * @return WeChatTemplateGetListItem[]
      */
-    public function request()
+    public function get() : array
     {
-        $result = parent::request();
-        $list   = isset($result['template_list']) ? $result['template_list'] : [];
-        $map    = new WeChatTemplateGetListList();
-        foreach ($list as $i => $r) {
+        $result = $this->request();
+        $list   = [];
+        foreach (isset($result['template_list']) ? $result['template_list'] : [] as $i => $r) {
             $item                  = new WeChatTemplateGetListItem();
             $item->title           = $r['title'];
             $item->templateId      = $r['template_id'];
@@ -35,9 +32,9 @@ class WeChatTemplateGetList extends WeChatPublicBaseRequest
             $item->example         = $r['example'];
             $item->primaryIndustry = $r['primary_industry'];
             $item->deputyIndustry  = $r['deputy_industry'];
-            $map->add($item);
+            $list[]                = $item;
         }
         
-        return $map;
+        return $list;
     }
 }

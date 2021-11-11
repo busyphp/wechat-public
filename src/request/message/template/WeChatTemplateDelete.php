@@ -3,13 +3,12 @@
 namespace BusyPHP\wechat\publics\request\message\template;
 
 use BusyPHP\wechat\publics\WeChatPublicBaseRequest;
-use BusyPHP\wechat\publics\WeChatPublicException;
 
 /**
  * 删除模板消息
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午12:01 下午 WeChatTemplateDelete.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:20 WeChatTemplateDelete.php $
  * @see https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1433751277
  */
 class WeChatTemplateDelete extends WeChatPublicBaseRequest
@@ -29,9 +28,8 @@ class WeChatTemplateDelete extends WeChatPublicBaseRequest
     
     /**
      * 执行删除
-     * @throws WeChatPublicException
      */
-    public function request()
+    public function delete()
     {
         parent::request();
     }

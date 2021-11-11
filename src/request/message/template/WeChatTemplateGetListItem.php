@@ -2,13 +2,15 @@
 
 namespace BusyPHP\wechat\publics\request\message\template;
 
+use BusyPHP\model\ObjectOption;
+
 /**
  * 模板列表集合Item
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/10/8 下午3:47 下午 WeChatTemplateGetListItem.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:21 WeChatTemplateGetListItem.php $
  */
-class WeChatTemplateGetListItem
+class WeChatTemplateGetListItem extends ObjectOption
 {
     /**
      * 模板消息ID
