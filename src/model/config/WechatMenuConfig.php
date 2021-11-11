@@ -8,7 +8,7 @@ use BusyPHP\wechat\publics\request\menu\WeChatMenuDelete;
 use BusyPHP\wechat\publics\request\menu\WeChatMenuGet;
 use BusyPHP\wechat\publics\model\WechatConfig;
 use BusyPHP\wechat\publics\request\menu\WeChatMenuGetResult;
-use BusyPHP\wechat\publics\request\menu\WeChatMenuList;
+use BusyPHP\wechat\publics\request\menu\WeChatMenuItem;
 use Exception;
 
 /**
@@ -29,9 +29,9 @@ class WechatMenuConfig extends WechatConfig
      */
     public function initConfigure($must = false)
     {
-        if ($this->getConfigure()->menu->length() < 1 || $must) {
+        if (count($this->getConfigure()->menu) < 1 || $must) {
             $get = new WeChatMenuGet();
-            $this->setConfigure($get->request());
+            $this->setConfigure($get->get());
         }
     }
     
@@ -47,7 +47,7 @@ class WechatMenuConfig extends WechatConfig
         if (!$result instanceof WeChatMenuGetResult) {
             $obj             = new WeChatMenuGetResult();
             $obj->isDisabled = false;
-            $obj->menu       = new WeChatMenuList();
+            $obj->menu       = [];
             
             return $obj;
         }
@@ -58,7 +58,7 @@ class WechatMenuConfig extends WechatConfig
     
     /**
      * 设置菜单数据
-     * @param null|WeChatMenuGetResult|WeChatMenuList $value
+     * @param null|WeChatMenuGetResult|WeChatMenuItem[] $value
      * @throws Exception
      */
     public function setConfigure($value)
@@ -66,15 +66,15 @@ class WechatMenuConfig extends WechatConfig
         if (is_null($value)) {
             $value             = new WeChatMenuGetResult();
             $value->isDisabled = false;
-            $value->menu       = new WeChatMenuList();
-        } elseif ($value instanceof WeChatMenuList) {
+            $value->menu       = [];
+        } elseif (is_array($value)) {
             $saveValue         = $value;
             $value             = new WeChatMenuGetResult();
             $value->isDisabled = false;
             $value->menu       = $saveValue;
         }
         
-        if ($value->menu->length() > 0) {
+        if (count($value->menu) > 0) {
             $obj = new WeChatMenuCreate();
             $obj->setMenuList($value->menu);
         }
@@ -90,7 +90,7 @@ class WechatMenuConfig extends WechatConfig
     public function clear()
     {
         $del = new WeChatMenuDelete();
-        $del->request();
+        $del->delete();
         $this->initConfigure(true);
     }
     
@@ -103,13 +103,13 @@ class WechatMenuConfig extends WechatConfig
     {
         $obj = new WeChatMenuCreate();
         $obj->setMenuList($this->getConfigure()->menu);
-        $obj->request();
+        $obj->create();
     }
     
     
     /**
      * 获取菜单值
-     * @param array $data 单个菜单数据
+     * @param WeChatMenuItem $data 单个菜单数据
      * @return string
      */
     public static function parseValue($data)
@@ -126,26 +126,18 @@ class WechatMenuConfig extends WechatConfig
     }
     
     
-    /**
-     * 解析菜单数据
-     * @param WeChatMenuList $list
-     * @return array
-     */
-    public static function parseList($list)
+    protected function onParseBindList(array &$list)
     {
-        $array = $list->_toArray();
-        foreach ($array as $i => $r) {
+        foreach ($list as $i => $r) {
             $r['value'] = self::parseValue($r);
-            if (isset($r['sub_button'])) {
-                foreach ($r['sub_button'] as $j => $item) {
-                    $item['value']       = self::parseValue($item);
-                    $r['sub_button'][$j] = $item;
+            if ($r->sub_button) {
+                foreach ($r->sub_button as $j => $item) {
+                    $item['value']     = self::parseValue($item);
+                    $r->sub_button[$j] = $item;
                 }
             }
-            $array[$i] = $r;
+            
+            $list[$i] = $r;
         }
-        
-        
-        return parent::parseList($array);
     }
 }

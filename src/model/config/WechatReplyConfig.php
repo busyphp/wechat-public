@@ -2,7 +2,7 @@
 
 namespace BusyPHP\wechat\publics\model\config;
 
-use BusyPHP\helper\util\Filter;
+use BusyPHP\helper\FilterHelper;
 use BusyPHP\wechat\publics\model\WechatConfig;
 use Exception;
 
@@ -41,7 +41,7 @@ class WechatReplyConfig extends WechatConfig
      */
     public function setConfigure($value)
     {
-        $value = Filter::trim($value);
+        $value = FilterHelper::trim($value);
         
         parent::setConfigure($value);
     }

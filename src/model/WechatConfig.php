@@ -3,16 +3,16 @@
 namespace BusyPHP\wechat\publics\model;
 
 use BusyPHP\exception\ParamInvalidException;
-use BusyPHP\exception\SQLException;
 use BusyPHP\Model;
 use Exception;
-
+use think\db\exception\DataNotFoundException;
+use think\db\exception\DbException;
 
 /**
  * 微信配置模型
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午10:39 上午 WechatConfig.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:43 WechatConfig.php $
  */
 class WechatConfig extends Model
 {
@@ -41,14 +41,12 @@ class WechatConfig extends Model
     /**
      * 设置配置
      * @param mixed $value
-     * @throws Exception
+     * @throws DbException
      */
     public function setConfigure($value)
     {
         $this->initConfigure();
-        if (false === $this->where('id', '=', $this->key)->saveData(['content' => serialize($value)])) {
-            throw new SQLException("修改配置{$this->key}失败", $this);
-        }
+        $this->where('id', '=', $this->key)->saveData(['content' => serialize($value)]);
         
         $this->initConfigure(true);
     }
@@ -58,23 +56,21 @@ class WechatConfig extends Model
      * 初始化配置
      * @param bool $must
      * @return mixed
-     * @throws Exception
+     * @throws DbException
+     * @throws DataNotFoundException
      */
     private function initConfigure($must = false)
     {
         if (!$this->key) {
-            throw new ParamInvalidException('需要配置key');
+            throw new ParamInvalidException('key');
         }
         
         $info = $this->getCache($this->key);
         if (!$info || $must) {
-            $info = $this->where('id', '=', $this->key)->findData();
+            $info = $this->where('id', '=', $this->key)->findInfo();
             if (!$info) {
-                if (!$this->addData(['id' => $this->key])) {
-                    throw new SQLException("插入配置{$this->key}失败", $this);
-                }
-                
-                $info = $this->findData($this->key);
+                $this->addData(['id' => $this->key]);
+                $info = $this->getInfo($this->key);
             }
             
             $info['content'] = unserialize($info['content']);
