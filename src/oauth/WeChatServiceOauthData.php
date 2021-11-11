@@ -8,7 +8,7 @@ use BusyPHP\wechat\publics\request\user\WeChatUserInfoData;
 /**
  * 微信服务端登录数据结构
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
  * @version $Id: 2020/10/8 下午3:35 下午 WeChatServiceOauthData.php $
  */
 class WeChatServiceOauthData extends OAuthAppData

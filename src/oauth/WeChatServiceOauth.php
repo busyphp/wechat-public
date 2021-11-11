@@ -3,15 +3,15 @@
 namespace BusyPHP\wechat\publics\oauth;
 
 use BusyPHP\exception\ParamInvalidException;
+use BusyPHP\oauth\defines\OAuthType;
 use BusyPHP\oauth\interfaces\OAuthApp;
 use BusyPHP\oauth\interfaces\OAuthInfo;
-use BusyPHP\oauth\OAuthType;
 
 /**
  * 微信用户关注Oauth
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/22 下午6:57 下午 WeChatServiceOauth.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:09 WeChatServiceOauth.php $
  * @property WeChatServiceOauthData $data
  */
 class WeChatServiceOauth extends OAuthApp
@@ -24,9 +24,9 @@ class WeChatServiceOauth extends OAuthApp
     
     /**
      * 获取登录类型
-     * @return string
+     * @return int
      */
-    public function getType()
+    public function getType() : int
     {
         return OAuthType::TYPE_WECHAT_PUBLIC;
     }
@@ -34,9 +34,9 @@ class WeChatServiceOauth extends OAuthApp
     
     /**
      * 获取厂商类型
-     * @return string
+     * @return int
      */
-    public function getUnionType()
+    public function getUnionType() : int
     {
         return OAuthType::COMPANY_WECHAT;
     }
@@ -47,7 +47,7 @@ class WeChatServiceOauth extends OAuthApp
      * @return OAuthInfo
      * @throws ParamInvalidException
      */
-    public function onGetInfo()
+    public function onGetInfo() : OAuthInfo
     {
         $info = new OAuthInfo($this);
         $info->setOpenId($this->data->info->openid);
