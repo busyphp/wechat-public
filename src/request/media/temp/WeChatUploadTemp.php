@@ -8,8 +8,8 @@ use BusyPHP\wechat\publics\WeChatPublicException;
 /**
  * 上传临时素材
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午11:54 上午 WeChatUploadTemp.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:27 WeChatUploadTemp.php $
  * @see https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1444738726
  */
 class WeChatUploadTemp extends WeChatPublicBaseRequest
@@ -48,7 +48,7 @@ class WeChatUploadTemp extends WeChatPublicBaseRequest
      * @return string
      * @throws WeChatPublicException
      */
-    public function request()
+    public function upload() : string
     {
         $result = parent::request();
         

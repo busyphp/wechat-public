@@ -3,14 +3,12 @@
 namespace BusyPHP\wechat\publics\request\media\forever;
 
 use BusyPHP\wechat\publics\WeChatPublicBaseRequest;
-use BusyPHP\wechat\publics\WeChatPublicException;
-
 
 /**
  * 上传永久素材
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午11:53 上午 WeChatUploadForever.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:26 WeChatUploadForever.php $
  */
 class WeChatUploadForever extends WeChatPublicBaseRequest
 {
@@ -60,9 +58,8 @@ class WeChatUploadForever extends WeChatPublicBaseRequest
     /**
      * 执行上传
      * @return WeChatUploadForeverResult
-     * @throws WeChatPublicException
      */
-    public function request()
+    public function upload() : WeChatUploadForeverResult
     {
         $result = parent::request();
         

@@ -2,7 +2,7 @@
 
 namespace BusyPHP\wechat\publics\request\media\temp;
 
-use BusyPHP\helper\net\Http;
+use BusyPHP\helper\HttpHelper;
 use BusyPHP\wechat\publics\WeChatPublicBaseRequest;
 use BusyPHP\wechat\publics\WeChatPublicException;
 use Throwable;
@@ -10,8 +10,8 @@ use Throwable;
 /**
  * 下载临时素材
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午11:54 上午 WeChatDownloadTemp.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:12 WeChatDownloadTemp.php $
  * @see https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1444738727
  */
 class WeChatDownloadTemp extends WeChatPublicBaseRequest
@@ -41,24 +41,24 @@ class WeChatDownloadTemp extends WeChatPublicBaseRequest
      * @return array|string
      * @throws WeChatPublicException
      */
-    public function request()
+    public function download()
     {
         $url  = "https://{$this->host}/{$this->path}{$this->getAccessToken()}";
-        $http = new Http();
+        $http = new HttpHelper();
         $http->setTimeout(30);
         try {
-            $result = Http::get($url, $this->params, $http);
+            $result = HttpHelper::get($url, $this->params, $http);
         } catch (Throwable $e) {
             throw new WeChatPublicException("HTTP请求失败: {$e->getMessage()} [{$e->getCode()}]");
         }
         
         if (!$this->isVideo) {
             if (substr($result, 0, 2) == '{"') {
-                $result = json_decode($result, true);
+                $result = json_decode($result, true) ?: [];
                 throw new WeChatPublicException($result['errmsg'], $result['errcode']);
             }
         } else {
-            $result = json_decode($result, true);
+            $result = json_decode($result, true) ?: [];
             if ($result['errcode'] != '0') {
                 throw new WeChatPublicException($result['errmsg'], $result['errcode']);
             }
