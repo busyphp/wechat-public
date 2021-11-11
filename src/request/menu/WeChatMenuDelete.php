@@ -21,7 +21,7 @@ class WeChatMenuDelete extends WeChatMenu
      * @return array
      * @throws WeChatPublicException
      */
-    public function request()
+    public function delete() : array
     {
         return parent::request();
     }

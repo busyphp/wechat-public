@@ -2,14 +2,13 @@
 
 namespace BusyPHP\wechat\publics\request\menu;
 
-use BusyPHP\helper\util\Transform;
-use BusyPHP\wechat\publics\WeChatPublicException;
+use BusyPHP\helper\TransHelper;
 
 /**
  * 自定义菜单查询接口
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午11:59 上午 WeChatMenuGet.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:31 WeChatMenuGet.php $
  * @see https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421141014
  */
 class WeChatMenuGet extends WeChatMenu
@@ -20,15 +19,18 @@ class WeChatMenuGet extends WeChatMenu
     /**
      * 执行查询
      * @return WeChatMenuGetResult
-     * @throws WeChatPublicException
      */
-    public function request()
+    public function get()
     {
         $result = parent::request();
         
         $res             = new WeChatMenuGetResult();
-        $res->isDisabled = Transform::dataToBool($result['is_menu_open']) === false;
-        $res->menu       = new WeChatMenuList($result['selfmenu_info']['button']);
+        $res->isDisabled = TransHelper::toBool($result['is_menu_open']) === false;
+        $menu            = [];
+        foreach ($result['selfmenu_info']['button'] as $item) {
+            $menu[] = new WeChatMenuItem($item);
+        }
+        $res->menu = $menu;
         
         return $res;
     }

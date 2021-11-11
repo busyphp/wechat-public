@@ -3,14 +3,15 @@
 namespace BusyPHP\wechat\publics\request\menu;
 
 use BusyPHP\exception\VerifyException;
+use BusyPHP\model\ObjectOption;
 
 /**
  * 微信菜单Item
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/10/8 下午3:43 下午 WeChatMenuItem.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:28 WeChatMenuItem.php $
  */
-class WeChatMenuItem
+class WeChatMenuItem extends ObjectOption
 {
     /**
      * 菜单的响应动作类型，view表示网页类型，click表示点击类型，miniprogram表示小程序类型
@@ -56,7 +57,7 @@ class WeChatMenuItem
     
     /**
      * 子菜单合集
-     * @var WeChatMenuList
+     * @var WeChatMenuItem[]
      */
     public $sub_button;
     
@@ -67,14 +68,20 @@ class WeChatMenuItem
      */
     public function __construct($array = [])
     {
-        foreach (get_object_vars($this) as $key => $value) {
+        foreach ($this->toArray() as $key => $value) {
             if ($key == 'sub_button') {
-                if ($array[$key]) {
-                    if (isset($array[$key]['list'])) {
-                        $this->$key = new WeChatMenuList($array[$key]['list']);
+                if (!empty($array['sub_button'])) {
+                    $buttons = [];
+                    if (isset($array['sub_button']['list'])) {
+                        foreach ($array['sub_button']['list'] as $item) {
+                            $buttons[] = new WeChatMenuItem($item);
+                        }
                     } else {
-                        $this->$key = new WeChatMenuList($array[$key]);
+                        foreach ($array['sub_button'] as $item) {
+                            $buttons[] = new WeChatMenuItem($item);
+                        }
                     }
+                    $this->sub_button = $buttons;
                 }
             } elseif (isset($array[$key])) {
                 $this->$key = $array[$key];
@@ -84,7 +91,7 @@ class WeChatMenuItem
     
     
     /**
-     * @param WeChatMenuList $sub_button
+     * @param WeChatMenuItem[] $sub_button
      */
     public function setSubButton($sub_button)
     {
@@ -113,15 +120,6 @@ class WeChatMenuItem
         
         if (!$name) {
             throw new VerifyException(($isSub ? '子' : '主') . '菜单名称不能为空', 'name');
-        }
-        if ($isSub) {
-            if (strlen($name) > 60) {
-                throw new VerifyException('子菜单名称长度不能超过60个字节', 'name');
-            }
-        } else {
-            if (strlen($name) > 16) {
-                //throw new VerifyException('主菜单名称长度不能超过16个字节', 'name');
-            }
         }
         
         $this->name = $name;
@@ -174,28 +172,5 @@ class WeChatMenuItem
         }
         
         return $this;
-    }
-    
-    
-    /**
-     * 将结果转换成数组
-     * @return array
-     */
-    public function _toArray()
-    {
-        $array = [];
-        foreach (get_object_vars($this) as $key => $value) {
-            if (!isset($value)) {
-                continue;
-            }
-            
-            if ($value instanceof WeChatMenuList) {
-                $array[$key] = $value->_toArray();
-            } else {
-                $array[$key] = $value;
-            }
-        }
-        
-        return $array;
     }
 }
