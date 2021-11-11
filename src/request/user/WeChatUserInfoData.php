@@ -5,8 +5,8 @@ namespace BusyPHP\wechat\publics\request\user;
 /**
  * 获取用户基本信息结构
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/10/8 下午3:48 下午 WeChatUserInfoData.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:15 WeChatUserInfoData.php $
  */
 class WeChatUserInfoData
 {

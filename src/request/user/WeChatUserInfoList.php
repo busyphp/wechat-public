@@ -2,15 +2,15 @@
 
 namespace BusyPHP\wechat\publics\request\user;
 
-use BusyPHP\helper\util\Filter;
+use BusyPHP\helper\FilterHelper;
 use BusyPHP\wechat\publics\WeChatPublicBaseRequest;
 use BusyPHP\wechat\publics\WeChatPublicException;
 
 /**
  * 批量获取用户基本信息
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午12:06 下午 WeChatUserInfoList.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:15 WeChatUserInfoList.php $
  */
 class WeChatUserInfoList extends WeChatPublicBaseRequest
 {
@@ -20,14 +20,13 @@ class WeChatUserInfoList extends WeChatPublicBaseRequest
     /**
      * 设置openid，最多100个
      * @param array|string $openid
-     * @throws WeChatPublicException
      */
     public function setOpenid($openid)
     {
         if (!is_array($openid)) {
             $openid = [$openid];
         }
-        $openid = Filter::trimArray($openid);
+        $openid = FilterHelper::trimArray($openid);
         if (count($openid) > 100) {
             throw new WeChatPublicException('每次最多允许拉取100个用户');
         }
@@ -44,37 +43,36 @@ class WeChatUserInfoList extends WeChatPublicBaseRequest
     
     /**
      * 执行获取用户信息
-     * @return WeChatUserInfoListMap
-     * @throws WeChatPublicException
+     * @return WeChatUserInfoData[]
      */
-    public function request()
+    public function get() : array
     {
-        $result = parent::request();
-        $map    = new WeChatUserInfoListMap();
-        foreach ($result['user_info_list'] as $item) {
-            $res           = new WeChatUserInfoData();
-            $res->isFollow = $item['subscribe'] == 1;
-            $res->openid   = $item['openid'];
-            if ($res->isFollow) {
-                $res->nickname    = $item['nickname'];
-                $res->sex         = $item['sex'];
-                $res->city        = $item['city'];
-                $res->country     = $item['country'];
-                $res->province    = $item['province'];
-                $res->language    = $item['language'];
-                $res->avatar      = $item['headimgurl'];
-                $res->followTime  = $item['subscribe_time'];
-                $res->unionid     = isset($item['unionid']) ? $item['unionid'] : null;
-                $res->remark      = $item['remark'];
-                $res->groupId     = $item['groupid'];
-                $res->tagIds      = $item['tagid_list'];
-                $res->followScene = $item['subscribe_scene'];
-                $res->qrScene     = $item['qr_scene'];
-                $res->qrSceneStr  = $item['qr_scene_str'];
+        $result = $this->request();
+        $list   = [];
+        foreach ($result['user_info_list'] as $vo) {
+            $item           = new WeChatUserInfoData();
+            $item->isFollow = $vo['subscribe'] == 1;
+            $item->openid   = $vo['openid'];
+            if ($item->isFollow) {
+                $item->nickname    = $vo['nickname'];
+                $item->sex         = $vo['sex'];
+                $item->city        = $vo['city'];
+                $item->country     = $vo['country'];
+                $item->province    = $vo['province'];
+                $item->language    = $vo['language'];
+                $item->avatar      = $vo['headimgurl'];
+                $item->followTime  = $vo['subscribe_time'];
+                $item->unionid     = isset($vo['unionid']) ? $vo['unionid'] : null;
+                $item->remark      = $vo['remark'];
+                $item->groupId     = $vo['groupid'];
+                $item->tagIds      = $vo['tagid_list'];
+                $item->followScene = $vo['subscribe_scene'];
+                $item->qrScene     = $vo['qr_scene'];
+                $item->qrSceneStr  = $vo['qr_scene_str'];
             }
-            $map->add($res);
+            $list[] = $item;
         }
         
-        return $map;
+        return $list;
     }
 }

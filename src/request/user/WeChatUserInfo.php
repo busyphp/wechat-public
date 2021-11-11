@@ -3,13 +3,12 @@
 namespace BusyPHP\wechat\publics\request\user;
 
 use BusyPHP\wechat\publics\WeChatPublicBaseRequest;
-use BusyPHP\wechat\publics\WeChatPublicException;
 
 /**
  * 获取用户基本信息
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午12:06 下午 WeChatUserInfo.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:23 WeChatUserInfo.php $
  */
 class WeChatUserInfo extends WeChatPublicBaseRequest
 {
@@ -34,9 +33,8 @@ class WeChatUserInfo extends WeChatPublicBaseRequest
     /**
      * 执行获取用户信息
      * @return WeChatUserInfoData
-     * @throws WeChatPublicException
      */
-    public function request()
+    public function get() : WeChatUserInfoData
     {
         $this->params['lang'] = 'zh_CN';
         $result               = parent::request();
