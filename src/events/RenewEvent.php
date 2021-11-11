@@ -7,7 +7,7 @@ use BusyPHP\wechat\publics\WeChatPublicBaseEvent;
 /**
  * 年审通知服务
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
  * @version $Id: 2020/7/8 下午11:39 上午 RenewEvent.php $
  * @see https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1455785130
  */

@@ -7,7 +7,7 @@ use BusyPHP\wechat\publics\WeChatPublicBaseEvent;
 /**
  * 点击菜单跳转链接时的事件推送服务
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
  * @version $Id: 2020/7/8 下午11:42 上午 ViewEvent.php $
  * @see https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421141016
  */

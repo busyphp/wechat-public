@@ -7,7 +7,7 @@ use BusyPHP\wechat\publics\WeChatPublicBaseEvent;
 /**
  * 扫描带参数二维码事件
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
  * @version $Id: 2020/7/8 下午11:40 上午 ScanEvent.php $
  */
 class ScanEvent extends WeChatPublicBaseEvent

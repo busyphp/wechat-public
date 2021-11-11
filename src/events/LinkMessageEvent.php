@@ -7,7 +7,7 @@ use BusyPHP\wechat\publics\WeChatPublicBaseEvent;
 /**
  * 接收链接消息服务
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
  * @version $Id: 2020/7/8 下午11:43 上午 LinkMessageEvent.php $
  */
 class LinkMessageEvent extends WeChatPublicBaseEvent

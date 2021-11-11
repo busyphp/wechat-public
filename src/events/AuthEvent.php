@@ -7,8 +7,8 @@ use BusyPHP\wechat\publics\WeChatPublicBaseEvent;
 /**
  * 微信认证事件资质认证服务
  * @author busy^life <busy.life@qq.com>
- * @copyright 2015 - 2018 busy^life <busy.life@qq.com>
- * @version $Id: 2018-05-13 下午10:24 EventAuthService.php busy^life $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:06 AuthEvent.php $
  * @see https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1455785130
  */
 class AuthEvent extends WeChatPublicBaseEvent
