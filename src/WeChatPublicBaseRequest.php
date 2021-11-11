@@ -1,16 +1,17 @@
 <?php
+declare(strict_types = 1);
 
 namespace BusyPHP\wechat\publics;
 
 use BusyPHP\Cache;
-use BusyPHP\helper\net\Http;
+use BusyPHP\helper\HttpHelper;
 use Throwable;
 
 /**
  * 微信公众号接口基本类
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午11:46 上午 BasePublic.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:01 WeChatPublicBaseRequest.php $
  */
 class WeChatPublicBaseRequest extends WeChatPublic
 {
@@ -71,7 +72,7 @@ class WeChatPublicBaseRequest extends WeChatPublic
         
         try {
             $url  = ($this->https ? 'https' : 'http') . "://{$this->host}/{$this->path}{$this->getAccessToken()}";
-            $http = new Http();
+            $http = new HttpHelper();
             $http->setTimeout($this->timeout);
             
             switch (strtolower($this->method)) {
@@ -81,25 +82,25 @@ class WeChatPublicBaseRequest extends WeChatPublic
                             $http->addFile($key, $file);
                         }
                     }
-                    $result = Http::post($url, $params, $http);
+                    $result = HttpHelper::post($url, $params, $http);
                 break;
                 case 'get':
-                    $result = Http::get($url, $params, $http);
+                    $result = HttpHelper::get($url, $params, $http);
                 break;
                 default:
-                    $result = Http::postJSON($url, json_encode($params, JSON_UNESCAPED_UNICODE), $http);
+                    $result = HttpHelper::postJSON($url, json_encode($params, JSON_UNESCAPED_UNICODE), $http);
             }
         } catch (Throwable $e) {
             throw new WeChatPublicException("HTTP请求失败: {$e->getMessage()} [{$e->getCode()}]");
         }
         
-        $result = json_decode($result, true);
+        $result = json_decode((string) $result, true) ?: [];
         if (!$result) {
             throw new WeChatPublicException("请求数据异常");
         }
         
-        if (isset($result['errcode']) && $result['errcode'] != '0') {
-            throw new WeChatPublicException($result['errmsg'], $result['errcode']);
+        if (($result['errcode'] ?? -1) != 0) {
+            throw new WeChatPublicException($result['errmsg'] ?? '', intval($result['errcode'] ?? 0));
         }
         
         return $result;
@@ -122,23 +123,23 @@ class WeChatPublicBaseRequest extends WeChatPublic
             $params['secret']     = $this->getAppSecret();
             
             try {
-                $http = new Http();
+                $http = new HttpHelper();
                 $http->setTimeout($this->timeout);
-                $result = Http::get("https://{$this->host}/cgi-bin/token", $params, $http);
+                $result = HttpHelper::get("https://{$this->host}/cgi-bin/token", $params, $http);
             } catch (Throwable $e) {
                 throw new WeChatPublicException("HTTP请求失败: {$e->getMessage()} [{$e->getCode()}]");
             }
             
-            $result = json_decode($result, true);
+            $result = json_decode((string) $result, true) ?: [];
             if (!$result) {
                 throw new WeChatPublicException("请求数据异常");
             }
             
-            if (isset($result['errcode']) && $result['errcode'] != '0') {
-                throw new WeChatPublicException($result['errmsg'], $result['errcode']);
+            if (($result['errcode'] ?? -1) != '0') {
+                throw new WeChatPublicException($result['errmsg'] ?? '', intval($result['errcode'] ?? 0));
             }
             
-            if (!$result['access_token']) {
+            if (empty($result['access_token'])) {
                 throw new WeChatPublicException('获取accessToken失败');
             }
             

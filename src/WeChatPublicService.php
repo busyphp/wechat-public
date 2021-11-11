@@ -2,6 +2,7 @@
 
 namespace BusyPHP\wechat\publics;
 
+use BusyPHP\helper\LogHelper;
 use BusyPHP\wechat\publics\events\AuthEvent;
 use BusyPHP\wechat\publics\events\ClickEvent;
 use BusyPHP\wechat\publics\events\FollowEvent;
@@ -19,16 +20,14 @@ use BusyPHP\wechat\publics\events\TextMessageEvent;
 use BusyPHP\wechat\publics\events\VideoMessageEvent;
 use BusyPHP\wechat\publics\events\ViewEvent;
 use BusyPHP\wechat\publics\events\VoiceMessageEvent;
-use BusyPHP\wechat\WeChatLogs;
 use think\Response;
 use Throwable;
-
 
 /**
  * 微信服务类
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午11:25 上午 WeChatService.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:48 WeChatPublicService.php $
  */
 class WeChatPublicService extends WeChatPublic
 {
@@ -56,25 +55,26 @@ class WeChatPublicService extends WeChatPublic
      */
     protected function checkSignature()
     {
-        $signature = isset($_REQUEST["signature"]) ? $_REQUEST["signature"] : '';
-        $timestamp = isset($_REQUEST["timestamp"]) ? $_REQUEST["timestamp"] : '';
-        $nonce     = isset($_REQUEST["nonce"]) ? $_REQUEST['nonce'] : '';
+        $request   = $this->app->request;
+        $signature = $request->param('signature/s', '', 'trim');
+        $timestamp = $request->param('timestamp/s', '', 'trim');
+        $nonce     = $request->param('nonce/s', '', 'trim');
         $tempArr   = [$this->getToken(), $timestamp, $nonce];
         sort($tempArr, SORT_STRING);
         if ($signature == sha1(implode('', $tempArr))) {
-            return isset($_REQUEST['echostr']) ? $_REQUEST['echostr'] : '';
-        } else {
-            throw new WeChatPublicException("signature校验失败");
+            return $request->param('echostr/s', '', 'trim');
         }
+        
+        throw new WeChatPublicException("signature校验失败");
     }
     
     
     /**
      * 服务入口
      */
-    public function service()
+    public function service() : Response
     {
-        WeChatLogs::addInfo('微信公众号异步通知');
+        self::log()->info('微信公众号异步通知');
         
         try {
             // 校验签名
@@ -88,7 +88,7 @@ class WeChatPublicService extends WeChatPublic
             // 执行服务调度
             return $this->dispatch();
         } catch (Throwable $e) {
-            WeChatLogs::addError($e->getMessage());
+            self::log()->error($e);
             
             return WeChatPublicBaseEvent::replyMessage();
         }
@@ -105,7 +105,7 @@ class WeChatPublicService extends WeChatPublic
         libxml_disable_entity_loader(true);
         $xml  = file_get_contents('php://input');
         $data = json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
-        WeChatLogs::addInfo("请求数据: {$xml}");
+        self::log()->tag('通知实体')->info($xml);
         
         $event     = null;
         $eventName = '未识别类型';
@@ -259,15 +259,27 @@ class WeChatPublicService extends WeChatPublic
         $event::$eventName = $eventName;
         
         // 执行指定的服务
-        WeChatLogs::addInfo("开始处理: {$eventName} (" . get_class($event) . ")");
+        self::log()->tag('处理事件')->info("开始, {$eventName} (" . get_class($event) . ")");
         if ($event != null && $event instanceof WeChatPublicBaseEvent) {
             $event->setCanReply($canReply);
-            WeChatLogs::addInfo('处理成功');
+            $result = $event->handle();
             
-            return $event->handle();
+            self::log()->tag('处理事件')->info($result->getContent());
+            
+            return $result;
         }
         
         // 其它未知服务一律回复处理成功
         return WeChatPublicBaseEvent::replyMessage();
+    }
+    
+    
+    /**
+     * 日志驱动
+     * @return LogHelper
+     */
+    public static function log() : LogHelper
+    {
+        return LogHelper::plugin('wechat_public');
     }
 }

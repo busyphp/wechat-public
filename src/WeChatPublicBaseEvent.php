@@ -2,7 +2,6 @@
 
 namespace BusyPHP\wechat\publics;
 
-use BusyPHP\wechat\WeChatLogs;
 use think\facade\Event;
 use think\Response;
 use Throwable;
@@ -10,8 +9,8 @@ use Throwable;
 /**
  * 微信推送服务基本类
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午11:32 上午 BaseService.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午11:02 WeChatPublicBaseEvent.php $
  */
 abstract class WeChatPublicBaseEvent extends WeChatPublic
 {
@@ -126,7 +125,7 @@ abstract class WeChatPublicBaseEvent extends WeChatPublic
      */
     public static function replyMessage($message = 'success')
     {
-        WeChatLogs::addInfo("回复: {$message}");
+        WeChatPublicService::log()->tag('回复消息')->info($message);
         
         return Response::create($message)->contentType('text/plain');
     }
@@ -148,7 +147,7 @@ abstract class WeChatPublicBaseEvent extends WeChatPublic
             $data['MsgType']      = $type;
             
             $xml = self::arrayToXml($data);
-            WeChatLogs::addInfo("回复: {$xml}");
+            WeChatPublicService::log()->tag('回复消息')->info($xml);
             
             return Response::create($xml)->contentType('text/plain');
         }
