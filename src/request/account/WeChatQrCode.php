@@ -2,15 +2,15 @@
 
 namespace BusyPHP\wechat\publics\request\account;
 
-use BusyPHP\helper\util\Filter;
+use BusyPHP\helper\FilterHelper;
 use BusyPHP\wechat\publics\WeChatPublicBaseRequest;
 use BusyPHP\wechat\publics\WeChatPublicException;
 
 /**
  * 生成带参数的二维码Ticket
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
- * @version $Id: 2020/7/8 下午12:22 下午 WeChatQrCode.php $
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @version $Id: 2021/11/11 上午10:11 WeChatQrCode.php $
  */
 class WeChatQrCode extends WeChatPublicBaseRequest
 {
@@ -24,7 +24,7 @@ class WeChatQrCode extends WeChatPublicBaseRequest
     public function setExpire($expire)
     {
         $expire = intval($expire);
-        $expire = Filter::max($expire, 2592000);
+        $expire = FilterHelper::max($expire, 2592000);
         
         $this->params['expire_seconds'] = $expire;
     }
@@ -81,9 +81,8 @@ class WeChatQrCode extends WeChatPublicBaseRequest
     /**
      * 执行请求
      * @return WeChatQrCodeResult
-     * @throws WeChatPublicException
      */
-    public function request()
+    public function create() : WeChatQrCodeResult
     {
         $result         = parent::request();
         $res            = new WeChatQrCodeResult();

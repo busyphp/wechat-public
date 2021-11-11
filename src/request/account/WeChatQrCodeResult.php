@@ -5,7 +5,7 @@ namespace BusyPHP\wechat\publics\request\account;
 /**
  * 微信生成带参数的二维码Ticket 返回结构
  * @author busy^life <busy.life@qq.com>
- * @copyright (c) 2015--2019 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
+ * @copyright (c) 2015--2021 ShanXi Han Tuo Technology Co.,Ltd. All rights reserved.
  * @version $Id: 2020/10/8 下午3:38 下午 WeChatQrCodeResult.php $
  */
 class WeChatQrCodeResult
