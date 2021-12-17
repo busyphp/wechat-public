@@ -39,7 +39,7 @@ class WeChatPublicService extends WeChatPublic
         parent::__construct();
         
         // 监听事件
-        $listens = $this->getConfig('public.listen', []);
+        $listens = $this->getWeChatConfig('public.listen', []);
         foreach ($listens as $event => $listen) {
             if (!$listen) {
                 continue;

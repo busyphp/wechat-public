@@ -47,14 +47,23 @@ abstract class WeChatPublic
     
     /**
      * WeChatPublic constructor.
+     * @param string $accountId 多账户标识
      */
-    public function __construct()
+    public function __construct(string $accountId = '')
     {
-        $this->app            = App::getInstance();
-        $this->appId          = $this->getConfig('public.app_id');
-        $this->appSecret      = $this->getConfig('public.app_secret');
-        $this->token          = $this->getConfig('public.token');
-        $this->encodingAESKey = $this->getConfig('public.encoding_aes_key');
+        $this->app = App::getInstance();
+        
+        if (!$accountId) {
+            $this->appId          = $this->getWeChatConfig('public.app_id');
+            $this->appSecret      = $this->getWeChatConfig('public.app_secret');
+            $this->token          = $this->getWeChatConfig('public.token');
+            $this->encodingAESKey = $this->getWeChatConfig('public.encoding_aes_key');
+        } else {
+            $this->appId          = $this->getWeChatConfig("public.multi.{$accountId}.app_id");
+            $this->appSecret      = $this->getWeChatConfig('public.multi.{$accountId}.app_secret');
+            $this->token          = $this->getWeChatConfig('public.multi.{$accountId}.token');
+            $this->encodingAESKey = $this->getWeChatConfig('public.multi.{$accountId}.encoding_aes_key');
+        }
     }
     
     
