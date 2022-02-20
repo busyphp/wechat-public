@@ -2,7 +2,7 @@
 
 namespace BusyPHP\wechat\publics;
 
-use BusyPHP\wechat\WeChatConfig;
+use BusyPHP\wechat\WithWeChatConfig;
 use think\App;
 
 /**
@@ -13,7 +13,7 @@ use think\App;
  */
 abstract class WeChatPublic
 {
-    use WeChatConfig;
+    use WithWeChatConfig;
     
     /**
      * 公众号appId
